@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#173A30">
+<title>BC Family Road Trip — Our Itinerary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#EDEAE0; --card:#FBFAF6; --ink:#173A30; --forest:#2F6B4F;
+    --lake:#2B6C87; --amber:#BC7C2A; --clay:#8A6A4A; --stone:#7C776B;
+    --line:#DAD5C8; --line2:#E7E2D6;
+    --shadow:0 1px 2px rgba(23,58,48,.06), 0 6px 20px rgba(23,58,48,.06);
+    --disp:'Bricolage Grotesque', system-ui, sans-serif;
+    --body:'Inter', system-ui, sans-serif;
+    --mono:'Space Mono', ui-monospace, monospace;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:var(--body); color:var(--ink); background:var(--paper);
+    line-height:1.5; -webkit-font-smoothing:antialiased;
+    padding:0 0 64px; max-width:640px; margin:0 auto;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    padding:26px 20px 18px; position:relative; overflow:hidden;
+    background:
+      radial-gradient(120% 90% at 88% -10%, rgba(43,108,135,.16), transparent 60%),
+      radial-gradient(120% 90% at -10% 6%, rgba(47,107,79,.16), transparent 55%),
+      var(--paper);
+    border-bottom:1px solid var(--line);
+  }
+  .kicker{
+    font-family:var(--mono); font-size:11px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--forest); font-weight:700; margin:0 0 8px;
+  }
+  h1{
+    font-family:var(--disp); font-weight:800; font-size:clamp(30px,8.5vw,42px);
+    line-height:1.02; letter-spacing:-.02em; margin:0 0 6px;
+  }
+  h1 .thin{ color:var(--forest); }
+  .route-sub{ font-size:13.5px; color:var(--stone); margin:0 0 16px; font-weight:500; }
+  .facts{ display:flex; flex-wrap:wrap; gap:8px; }
+  .fact{
+    font-family:var(--mono); font-size:11.5px; background:var(--card);
+    border:1px solid var(--line); border-radius:999px; padding:6px 11px; color:var(--ink);
+  }
+  .fact b{ color:var(--amber); }
+  .countdown{ background:var(--ink); color:#F3EFE4; border-color:var(--ink); }
+  .countdown b{ color:#E8B979; }
+
+  /* ---------- controls ---------- */
+  .bar{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:12px 20px; position:sticky; top:0; z-index:20;
+    background:rgba(237,234,224,.86); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .legend{ display:flex; gap:12px; font-size:10.5px; color:var(--stone); font-family:var(--mono); flex-wrap:wrap; }
+  .legend span{ display:inline-flex; align-items:center; gap:4px; }
+  .lg{ width:12px; height:12px; border-radius:50%; display:inline-block; }
+  .toggle{
+    font-family:var(--mono); font-size:11px; color:var(--lake); background:none;
+    border:1px solid var(--line); border-radius:999px; padding:6px 10px; cursor:pointer;
+    white-space:nowrap;
+  }
+  .toggle:active{ transform:scale(.97) }
+
+  /* ---------- timeline ---------- */
+  main{ padding:6px 16px 0; }
+  .day{ position:relative; padding:0 0 4px 44px; }
+  .spine{ position:absolute; left:15px; top:0; bottom:0; width:2px; background:var(--line); }
+  .day:last-child .spine{ background:linear-gradient(var(--line), transparent); }
+  .node{
+    position:absolute; left:8px; top:20px; width:18px; height:18px; border-radius:50%;
+    background:var(--card); border:2.5px solid var(--forest); z-index:2;
+    display:grid; place-items:center;
+  }
+  .node.city{ border-color:var(--lake) }
+  .node.ferry{ border-color:var(--amber); background:var(--amber) }
+  .node.cabin{ border-color:var(--clay) }
+  .node.rest{ border-color:var(--stone) }
+  .node.home{ border-color:var(--ink); background:var(--ink) }
+  .node.peak{ border-color:var(--amber) }
+  .node svg{ width:10px; height:10px; display:block }
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:15px;
+    box-shadow:var(--shadow); margin:10px 0 14px; overflow:hidden;
+  }
+  .card.today{ border-color:var(--amber); box-shadow:0 0 0 2px rgba(188,124,42,.25), var(--shadow); }
+
+  .head{ padding:14px 15px; cursor:pointer; display:block; }
+  .head-top{ display:flex; align-items:center; gap:8px; margin-bottom:3px; }
+  .date{ font-family:var(--mono); font-size:11.5px; color:var(--stone); letter-spacing:.02em; }
+  .nights{ font-family:var(--mono); font-size:10px; color:var(--forest); background:rgba(47,107,79,.1);
+    padding:2px 7px; border-radius:999px; }
+  .tag{ font-family:var(--mono); font-size:9.5px; text-transform:uppercase; letter-spacing:.08em;
+    padding:3px 8px; border-radius:999px; margin-left:auto; font-weight:700; }
+  .tag.drive{ background:rgba(47,107,79,.12); color:var(--forest) }
+  .tag.city{ background:rgba(43,108,135,.12); color:var(--lake) }
+  .tag.ferry{ background:rgba(188,124,42,.15); color:var(--amber) }
+  .tag.cabin{ background:rgba(138,106,74,.14); color:var(--clay) }
+  .tag.rest{ background:rgba(124,119,107,.14); color:var(--stone) }
+  .tag.home{ background:var(--ink); color:#F0EBDE }
+
+  .place{ font-family:var(--disp); font-weight:700; font-size:22px; letter-spacing:-.01em; line-height:1.1; margin:1px 0 2px; }
+  .region{ font-size:12.5px; color:var(--stone); }
+  .drive-line{ display:flex; align-items:center; gap:7px; margin-top:9px; font-size:12.5px; color:var(--ink); }
+  .drive-line svg{ width:14px; height:14px; flex:none; color:var(--stone) }
+  .chev{ transition:transform .25s ease; color:var(--stone); margin-left:6px }
+  .card.open .chev{ transform:rotate(180deg) }
+
+  .body{ display:none; padding:0 15px 15px; }
+  .card.open .body{ display:block; animation:fade .3s ease }
+  @keyframes fade{ from{opacity:0; transform:translateY(-4px)} to{opacity:1; transform:none} }
+
+  .divider{ height:1px; background:var(--line2); margin:2px 0 13px; }
+
+  /* actions row */
+  .actions{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:13px; }
+  .btn{
+    display:inline-flex; align-items:center; gap:6px; font-family:var(--body);
+    font-size:12.5px; font-weight:600; text-decoration:none; padding:9px 13px;
+    border-radius:10px; border:1px solid transparent; cursor:pointer;
+  }
+  .btn svg{ width:14px; height:14px }
+  .btn-dir{ background:var(--lake); color:#fff; }
+  .btn-mail{ background:var(--card); color:var(--ink); border-color:var(--line); }
+  .btn-map{ background:rgba(47,107,79,.1); color:var(--forest); }
+  .btn:active{ transform:scale(.97) }
+  .head .btn-dir{ margin-top:11px; }
+
+  /* lodging */
+  .lodge{ background:rgba(255,255,255,.6); border:1px solid var(--line2); border-radius:12px; padding:12px 13px; margin-bottom:13px; }
+  .lodge-h{ display:flex; align-items:baseline; gap:8px; margin-bottom:2px; }
+  .lodge-icon{ font-size:15px; }
+  .lodge-name{ font-weight:600; font-size:14.5px; line-height:1.25; }
+  .lodge-kind{ font-size:11.5px; color:var(--stone); margin-bottom:9px; }
+  .lodge-price{ font-family:var(--mono); font-size:14px; font-weight:700; color:var(--ink); margin-bottom:9px; }
+  .lodge-price .pn{ font-weight:400; color:var(--stone); font-size:11.5px; }
+  .lodge-repeat{ font-size:12px; color:var(--stone); font-style:italic; margin-bottom:9px; }
+  .conf{ font-family:var(--mono); font-size:11.5px; color:var(--ink); background:var(--paper);
+    border:1px dashed var(--line); border-radius:7px; padding:4px 8px; display:inline-block; margin:0 6px 8px 0; }
+  .lodge-note{ font-size:12px; color:var(--clay); margin:2px 0 11px; display:flex; gap:6px; }
+  .lodge-note svg{ width:13px; height:13px; flex:none; margin-top:2px }
+
+  /* ferry block */
+  .ferry-block{ background:rgba(188,124,42,.08); border:1px solid rgba(188,124,42,.3);
+    border-radius:12px; padding:12px 13px; margin-bottom:13px; }
+  .ferry-h{ display:flex; align-items:center; gap:7px; font-weight:700; font-size:13.5px; color:var(--amber); margin-bottom:6px; }
+  .ferry-h svg{ width:16px; height:16px }
+  .ferry-row{ font-size:12.5px; margin:3px 0; display:flex; gap:8px; }
+  .ferry-row .k{ font-family:var(--mono); font-size:10.5px; color:var(--stone); min-width:64px; text-transform:uppercase; letter-spacing:.05em; padding-top:2px }
+  .ferry-warn{ font-size:11.5px; color:var(--amber); font-weight:600; margin-top:7px; }
+
+  /* spots */
+  .spots-h{ font-family:var(--mono); font-size:10.5px; text-transform:uppercase; letter-spacing:.12em;
+    color:var(--stone); margin:4px 0 8px; }
+  .spot{ display:flex; gap:11px; text-decoration:none; color:inherit; padding:9px 0; border-top:1px solid var(--line2); align-items:flex-start; }
+  .spot:first-of-type{ border-top:none }
+  .pin{ width:26px; height:26px; border-radius:8px; background:rgba(43,108,135,.1); color:var(--lake);
+    display:grid; place-items:center; flex:none; margin-top:1px; }
+  .pin svg{ width:14px; height:14px }
+  .spot.star .pin{ background:rgba(188,124,42,.14); color:var(--amber) }
+  .spot-name{ font-weight:600; font-size:13.5px; line-height:1.25; }
+  .spot-name .badge{ font-family:var(--mono); font-size:9px; color:var(--amber); border:1px solid rgba(188,124,42,.4);
+    border-radius:4px; padding:0 4px; margin-left:6px; vertical-align:1.5px; text-transform:uppercase; letter-spacing:.05em }
+  .spot-blurb{ font-size:12px; color:var(--stone); margin-top:1px; }
+  .spot .go{ margin-left:auto; color:var(--line); flex:none; align-self:center }
+  .spot .go svg{ width:15px; height:15px }
+
+  /* pass note */
+  .pass{ display:flex; gap:8px; align-items:flex-start; background:rgba(47,107,79,.08);
+    border-radius:9px; padding:9px 11px; margin-top:12px; font-size:12px; color:var(--forest); }
+  .pass svg{ width:15px; height:15px; flex:none; margin-top:1px }
+  .pass b{ font-weight:700 }
+
+  footer{ text-align:center; font-family:var(--mono); font-size:10.5px; color:var(--stone);
+    padding:22px 20px 8px; line-height:1.7; }
+  footer a{ color:var(--lake) }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="kicker">Trip Hub · Heritage Day long trip</p>
+  <h1>BC Family <span class="thin">Road Trip</span></h1>
+  <p class="route-sub">Edmonton → Whistler → Vancouver → Victoria → up-island → Okanagan → home</p>
+  <div class="facts">
+    <span class="fact countdown" id="countdown">◷ counting…</span>
+    <span class="fact"><b>10</b> nights</span>
+    <span class="fact">Jul 24 – Aug 3, <b>2026</b></span>
+    <span class="fact"><b>6</b> travellers</span>
+  </div>
+</header>
+
+<div class="bar">
+  <div class="legend">
+    <span><i class="lg" style="background:var(--forest)"></i>Drive</span>
+    <span><i class="lg" style="background:var(--lake)"></i>City</span>
+    <span><i class="lg" style="background:var(--amber)"></i>Ferry</span>
+    <span><i class="lg" style="background:var(--clay)"></i>Cabin</span>
+  </div>
+  <button class="toggle" id="toggleAll">Expand all</button>
+</div>
+
+<main id="timeline"></main>
+
+<footer>
+  Tap any day to open it · Directions & map pins open Google Maps<br>
+  Live location is shared in our WhatsApp group — not on this page<br>
+  Family road trip · Jul 24 – Aug 3, 2026 · save to your Home Screen for quick access
+</footer>
+
+<script>
+/* ---------- icons ---------- */
+const I = {
+  car:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h14l2 5v5h-2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>',
+  dir:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>',
+  mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+  map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>',
+  chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>',
+  go:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></svg>',
+  ferry:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18a3 3 0 0 0 3-1 3 3 0 0 1 5 0 3 3 0 0 0 5 0 3 3 0 0 1 3 1"/><path d="M4 14 12 11l8 3"/><path d="M12 11V6"/><path d="M9 6h6"/></svg>',
+  alert:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg>',
+  pass:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>',
+  peak:'<svg viewBox="0 0 24 24" fill="#fff" stroke="#fff"><path d="m12 4 5 9-3-1-2 3-2-3-3 1 5-9Z"/></svg>',
+  home:'<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 4 4 11h2v8h5v-5h2v5h5v-8h2L12 4Z"/></svg>'
+};
+
+/* ---------- helpers ---------- */
+const enc = encodeURIComponent;
+const mapSearch = q => `https://www.google.com/maps/search/?api=1&query=${enc(q)}`;
+const mapDir = (to,wp) => {
+  let u = `https://www.google.com/maps/dir/?api=1&destination=${enc(to)}&travelmode=driving`;
+  if(wp) u += `&waypoints=${enc(wp)}`;
+  return u;
+};
+const gmail = id => `https://mail.google.com/mail/u/0/#all/${id}`;
+
+/* ---------- trip data ---------- */
+const DAYS = [
+{
+  date:'Fri · Jul 24', iso:'2026-07-24', n:1, type:'drive', place:'Valemount', region:'Rockies gateway, BC',
+  drive:{from:'Edmonton, AB', to:'Super 8 by Wyndham Valemount',
+         text:'Edmonton → Valemount · ~5.5 hrs · ~500 km (Yellowhead Hwy 16 via Jasper). Depart Friday afternoon, arrive evening.'},
+  lodge:{icon:'🛏️', name:'Super 8 by Wyndham Valemount', kind:'Motel · Booking.com', conf:null,
+         note:'Pay at property.', map:'Super 8 by Wyndham Valemount', email:null},
+  spots:[
+    {name:'George Hicks Regional Park', blurb:'Short riverside boardwalk; spawning salmon here in late summer.', q:'George Hicks Regional Park Valemount BC'},
+    {name:'Valemount & Area — Swiss Bakery', blurb:'Easy dinner or morning treat right in town.', q:'Valemount Swiss Bakery BC'}
+  ],
+  pass:'Canada Strong Pass — Jasper National Park entry is free on the drive through.'
+},
+{
+  date:'Sat · Jul 25', iso:'2026-07-25', n:2, type:'peak', tag:'drive', place:'Whistler → New West', region:'Duffey Lake Rd + gondola day',
+  drive:{from:'Super 8 by Wyndham Valemount', to:'New Westminster, BC', wp:'Whistler, BC',
+         text:'Valemount → Kamloops → Duffey Lake Rd (Hwy 99) → Whistler → New West · big day, ~9–10 hrs total. Leave by ~6 AM.'},
+  lodge:{icon:'🏠', name:'Royal City Retreat', kind:'Entire home · Airbnb · host Edina', conf:null,
+         note:null, map:'413 Seventh Ave, New Westminster, BC V3L 1W6', email:null},
+  spots:[
+    {name:'PEAK 2 PEAK Gondola, Whistler', blurb:'Ride up + glass-bottom cabin across the two peaks. Almost no walking — ideal for grandparents.', q:'PEAK 2 PEAK Gondola Whistler', star:true, badge:'the plan'},
+    {name:'Duffey Lake viewpoints (Hwy 99)', blurb:'Turquoise lake pullouts on the scenic back route in.', q:'Duffey Lake BC viewpoint'},
+    {name:'Brandywine Falls', blurb:'10-min flat walk to a 70 m waterfall, just south of Whistler.', q:'Brandywine Falls Provincial Park'}
+  ],
+  pass:null,
+  warn:'Fuel up in Kamloops — Duffey Lake Rd has long no-gas / patchy-signal stretches. Reach Whistler mid-afternoon so the gondola is still running (last ascent ~4–5 PM).'
+},
+{
+  date:'Sun · Jul 26', iso:'2026-07-26', n:3, type:'city', place:'Vancouver day', region:'based in New Westminster',
+  drive:{text:'City day — little driving. SkyTrain from New West drops you downtown in ~25 min (easy with the group).'},
+  lodge:{icon:'🏠', name:'Royal City Retreat', kind:'Entire home · Airbnb · host Edina', conf:null, repeat:'Night 2 · same stay',
+         note:null, map:'413 Seventh Ave, New Westminster, BC V3L 1W6', email:null},
+  spots:[
+    {name:'Stanley Park Seawall', blurb:'Flat waterfront loop — stroll or rent bikes; totem poles at Brockton Point.', q:'Stanley Park Seawall Vancouver'},
+    {name:'Granville Island Public Market', blurb:'Food stalls, crafts, kid-friendly wandering.', q:'Granville Island Public Market'},
+    {name:'Capilano Suspension Bridge', blurb:'Treetops + Cliffwalk (Lynn Canyon nearby is the free alternative).', q:'Capilano Suspension Bridge Park'},
+    {name:'Queen Elizabeth Park', blurb:'Gentle garden paths and the best city skyline view.', q:'Queen Elizabeth Park Vancouver'}
+  ],
+  pass:null
+},
+{
+  date:'Mon · Jul 27', iso:'2026-07-27', n:4, type:'ferry', place:'Ferry → Victoria', region:'to Vancouver Island',
+  drive:{from:'New Westminster, BC', to:'Island Travel Inn, Victoria BC',
+         text:'New West → Tsawwassen (~40 min) · ferry · Swartz Bay → Victoria (~35 min). Roll out by ~3:30 PM.'},
+  ferry:{route:'Tsawwassen → Swartz Bay', time:'5:00 PM → 6:35 PM', boat:'Spirit of Vancouver Island',
+         conf:null, checkin:'Be at the terminal by ~4:15 PM (check-in closes 4:30).', email:null, terminal:'Tsawwassen Ferry Terminal'},
+  lodge:{icon:'🛏️', name:'Island Travel Inn', kind:'Hotel · Booking.com · Victoria', conf:null,
+         note:'Bring a physical credit card — refundable damage-deposit pre-auth at check-in.', map:'Island Travel Inn Victoria BC', email:null},
+  spots:[
+    {name:'Inner Harbour & Parliament lights', blurb:'The Legislature is outlined in lights after dark — easy evening waterfront stroll.', q:'Inner Harbour Victoria BC Parliament'},
+    {name:"Fisherman's Wharf", blurb:'Floating village, food kiosks, resident harbour seals the kids will love.', q:"Fisherman's Wharf Victoria BC"}
+  ],
+  pass:null
+},
+{
+  date:'Tue · Jul 28', iso:'2026-07-28', n:5, type:'city', place:'Victoria', region:'gardens & harbour',
+  drive:{text:'Based in Victoria — short local hops only.'},
+  lodge:{icon:'🏠', name:'2-Bedroom Guest Suite', kind:'Entire suite · Airbnb · Victoria', conf:null,
+         note:null, map:'2566 Crystalview Dr, Victoria, BC V9B 6M8', email:null},
+  spots:[
+    {name:'Butchart Gardens', blurb:'World-famous gardens, flat accessible paths — your Victoria splurge.', q:'The Butchart Gardens Brentwood Bay', star:true, badge:'highlight'},
+    {name:'Beacon Hill Park', blurb:'Flat lawns, a petting farm for the kids, ocean lookout.', q:'Beacon Hill Park Victoria'},
+    {name:'Craigdarroch Castle', blurb:'Historic mansion (note: it has stairs) — skip if legs are tired.', q:'Craigdarroch Castle Victoria'}
+  ],
+  pass:null
+},
+{
+  date:'Wed · Jul 29', iso:'2026-07-29', n:6, type:'city', place:'Victoria', region:'coast & history',
+  drive:{text:'Second Victoria day — easy local driving.'},
+  lodge:{icon:'🏠', name:'2-Bedroom Guest Suite', kind:'Entire suite · Airbnb · Victoria', conf:null, repeat:'Night 2 · same stay',
+         note:null, map:'2566 Crystalview Dr, Victoria, BC V9B 6M8', email:null},
+  spots:[
+    {name:'Fort Rodd Hill & Fisgard Lighthouse', blurb:'Seaside historic site, gentle paths, red-and-white lighthouse.', q:'Fort Rodd Hill Fisgard Lighthouse', star:true, badge:'free w/ pass'},
+    {name:'Government House Gardens', blurb:'Free public gardens with easy loops and sea views.', q:'Government House Victoria BC gardens'},
+    {name:'Ogden Point Breakwater', blurb:'Flat, wide oceanfront walk — big open views.', q:'Ogden Point Breakwater Victoria'}
+  ],
+  pass:'Canada Strong Pass — Fort Rodd Hill (a Parks Canada site) is free.'
+},
+{
+  date:'Thu · Jul 30', iso:'2026-07-30', n:7, type:'drive', place:'Up-island → Errington', region:'Malahat & Coombs',
+  drive:{from:'Victoria, BC', to:'Errington, BC',
+         text:'Victoria → Errington · ~2 hrs up the Malahat. Arrive early afternoon, settle into the cabin.'},
+  lodge:{icon:'🏡', name:'King Bed · Firepit · Rural Retreat', kind:'Whole cabin · Airbnb · host Jacquie · 2 nights', conf:null,
+         note:'Sleeps all 6; rural — ~35 min to the Aug 1 ferry terminal.', map:'1970 Errington Rd, Errington, BC V0R 1V0', email:null},
+  spots:[
+    {name:'Malahat SkyWalk', blurb:'Gentle spiral ramp up a lookout tower — fully accessible, huge views. En route.', q:'Malahat SkyWalk', star:true, badge:'easy'},
+    {name:'Coombs Old Country Market', blurb:'The famous "goats on the roof," ice cream and quirky shops — 5 min from the cabin.', q:'Coombs Old Country Market'},
+    {name:'Rathtrevor Beach', blurb:'Huge flat sandy beach; tide goes way out over warm shallows. Great at sunset.', q:'Rathtrevor Beach Provincial Park'}
+  ],
+  pass:null
+},
+{
+  date:'Fri · Jul 31', iso:'2026-07-31', n:8, type:'cabin', place:'Parksville & Nanaimo', region:'big trees & shoreline',
+  drive:{text:'Cabin day — gentle drives around Parksville / Nanaimo.'},
+  lodge:{icon:'🏡', name:'King Bed · Firepit · Rural Retreat', kind:'Whole cabin · Airbnb · host Jacquie', conf:null, repeat:'Night 2 · same stay',
+         note:null, map:'1970 Errington Rd, Errington, BC V0R 1V0', email:null},
+  spots:[
+    {name:'Cathedral Grove (MacMillan Park)', blurb:'Flat boardwalk among 800-year-old Douglas firs — awe-inspiring and doable for everyone.', q:'Cathedral Grove MacMillan Provincial Park', star:true, badge:"don't miss"},
+    {name:'Englishman River Falls', blurb:'Short, easy loop to two waterfalls — ~10 min from the cabin.', q:'Englishman River Falls Provincial Park'},
+    {name:'Nanaimo Harbourfront (Maffeo Sutton)', blurb:'Seawall + lagoon; the historic Bastion fires its cannon at noon in summer.', q:'Maffeo Sutton Park Nanaimo'}
+  ],
+  pass:null
+},
+{
+  date:'Sat · Aug 1', iso:'2026-08-01', n:9, type:'ferry', place:'Ferry → Langley', region:'back to the mainland',
+  drive:{from:'Errington, BC', to:'Langley, BC',
+         text:'Errington → Departure Bay (~35 min) · ferry · Horseshoe Bay → Langley (~1 hr). Leave the cabin by ~7:15 AM.'},
+  ferry:{route:'Departure Bay → Horseshoe Bay', time:'8:40 AM → 10:22 AM', boat:'Queen of Oak Bay',
+         conf:null, checkin:'Be at Departure Bay by ~8:00 AM (check-in closes ~8:10).', email:null, terminal:'Departure Bay Ferry Terminal Nanaimo'},
+  lodge:{icon:'🏠', name:'Indulge in a State of Relaxation', kind:'Entire home · Airbnb · host Amit · Langley', conf:null,
+         note:null, map:'27026 27b Ave, Aldergrove, BC V4W 3E5', email:null},
+  spots:[
+    {name:'Fort Langley National Historic Site', blurb:'Riverside fur-trading fort — easy paths, costumed guides, great with kids.', q:'Fort Langley National Historic Site', star:true, badge:'free w/ pass'},
+    {name:'Krause Berry Farms', blurb:'U-pick, bakery and ice cream — a relaxed afternoon stop after the ferry.', q:'Krause Berry Farms Langley'}
+  ],
+  pass:'Canada Strong Pass — Fort Langley (a Parks Canada site) is free.'
+},
+{
+  date:'Sun · Aug 2', iso:'2026-08-02', n:10, type:'drive', place:'→ West Kelowna', region:'Okanagan wind-down',
+  drive:{from:'Langley, BC', to:'West Kelowna, BC',
+         text:'Langley → West Kelowna · ~4 hrs (Hwy 1 → Coquihalla → Hwy 97C). Easy afternoon arrival.'},
+  lodge:{icon:'🏠', name:'Family Getaway in the OK', kind:'Entire home · Airbnb · host Kristen · West Kelowna', conf:null,
+         note:'Last night before the big drive home — rest up.', map:'2402 Thacker Dr, West Kelowna, BC V1Z 1W1', email:null},
+  spots:[
+    {name:'Mission Hill Family Estate', blurb:'Hilltop winery with terraces and lake views — easy stroll, non-drinkers welcome too.', q:'Mission Hill Family Estate Winery West Kelowna'},
+    {name:'Gellatly Bay / Okanagan Lake', blurb:'Flat lakefront boardwalk and calm beaches for a swim.', q:'Gellatly Bay West Kelowna'}
+  ],
+  pass:null
+},
+{
+  date:'Mon · Aug 3', iso:'2026-08-03', n:null, type:'home', place:'Drive home', region:'Heritage Day',
+  drive:{from:'West Kelowna, BC', to:'Edmonton, AB',
+         text:'West Kelowna → Edmonton · ~10–11 hrs · ~900 km. The big one — leave early, split drivers, plan a real lunch stop in Revelstoke or Golden.'},
+  lodge:{icon:'🏁', name:'Home in Edmonton', kind:'Heritage Day — rest before Tuesday', conf:null,
+         note:null, map:'Edmonton, AB', email:null},
+  spots:[
+    {name:'Revelstoke — lunch & fuel', blurb:'Natural halfway break to stretch and refuel.', q:'Revelstoke BC downtown'},
+    {name:'Golden — second break', blurb:'Good stop before the mountain passes east.', q:'Golden BC'}
+  ],
+  pass:'Canada Strong Pass — if you route via Glacier / Yoho / Banff / Jasper, park entry is free.'
+}
+];
+
+/* ---------- render ---------- */
+const nodeGlyph = t => (t==='ferry'?I.ferry.replace(/currentColor/g,'#fff'): t==='peak'?I.peak : t==='home'?I.home : '');
+function render(){
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = DAYS.map((d,i)=>{
+    const tag = d.tag || d.type;
+    const tagName = {drive:'Drive',city:'Explore',ferry:'Ferry',cabin:'Cabin',rest:'Rest',home:'Home',peak:'Drive'}[d.type]||'Day';
+    const nodeCls = d.type;
+    const glyph = nodeGlyph(d.type);
+
+    const dirBtn = (d.lodge && d.lodge.map) ? `<a class="btn btn-dir" href="${mapDir(d.lodge.map, d.drive && d.drive.wp)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${I.dir} Directions</a>` : '';
+
+    const ferry = d.ferry ? `
+      <div class="ferry-block">
+        <div class="ferry-h">${I.ferry} ${d.ferry.route}</div>
+        <div class="ferry-row"><span class="k">Sailing</span><span>${d.ferry.time} · ${d.ferry.boat}</span></div>
+        
+        
+        <div class="ferry-warn">${I.alert.replace(/currentColor/g,'var(--amber)')} ${d.ferry.checkin}</div>
+        <div class="actions" style="margin:11px 0 0">
+          <a class="btn btn-map" href="${mapSearch(d.ferry.terminal)}" target="_blank" rel="noopener">${I.map} Terminal</a>
+          
+        </div>
+      </div>` : '';
+
+    const L = d.lodge;
+    const lodge = `
+      <div class="lodge">
+        <div class="lodge-h"><span class="lodge-icon">${L.icon}</span><span class="lodge-name">${L.name}</span></div>
+        <div class="lodge-kind">${L.kind}</div>
+        ${L.price?`<div class="lodge-price">${L.price}${L.nights?` <span class="pn">· ${L.nights}</span>`:''}</div>`:''}
+        ${L.repeat?`<div class="lodge-repeat">${L.repeat}</div>`:''}
+        ${L.conf?`<span class="conf">${L.conf}</span>`:''}
+        ${L.note?`<div class="lodge-note">${I.alert.replace(/currentColor/g,'var(--clay)')}<span>${L.note}</span></div>`:''}
+        <div class="actions" style="margin-bottom:0">
+          <a class="btn btn-map" href="${mapSearch(L.map)}" target="_blank" rel="noopener">${I.map} Map</a>
+          ${L.email?`<a class="btn btn-mail" href="${gmail(L.email)}" target="_blank" rel="noopener">${I.mail} Open email</a>`:''}
+        </div>
+      </div>`;
+
+    const warn = d.warn ? `<div class="ferry-warn" style="margin:-4px 0 13px; display:flex; gap:6px; align-items:flex-start">${I.alert.replace(/currentColor/g,'var(--amber)')}<span>${d.warn}</span></div>` : '';
+
+    const spots = d.spots && d.spots.length ? `
+      <div class="spots-h">Easy stops nearby</div>
+      ${d.spots.map(s=>`
+        <a class="spot ${s.star?'star':''}" href="${mapSearch(s.q)}" target="_blank" rel="noopener">
+          <span class="pin">${I.pin}</span>
+          <span>
+            <span class="spot-name">${s.name}${s.badge?`<span class="badge">${s.badge}</span>`:''}</span>
+            <span class="spot-blurb">${s.blurb}</span>
+          </span>
+          <span class="go">${I.go}</span>
+        </a>`).join('')}` : '';
+
+    const pass = d.pass ? `<div class="pass">${I.pass}<span><b>Free entry.</b> ${d.pass.replace('Canada Strong Pass — ','')}</span></div>` : '';
+
+    return `
+    <div class="day">
+      <div class="spine"></div>
+      <div class="node ${nodeCls}">${glyph}</div>
+      <div class="card" data-iso="${d.iso}" data-i="${i}">
+        <div class="head" onclick="toggle(${i})">
+          <div class="head-top">
+            <span class="date">${d.date}</span>
+            ${d.n?`<span class="nights">Night ${d.n}</span>`:''}
+            <span class="tag ${tag}">${tagName}</span>
+            <span class="chev">${I.chev}</span>
+          </div>
+          <div class="place">${d.place}</div>
+          <div class="region">${d.region}</div>
+          ${d.drive&&d.drive.text?`<div class="drive-line">${I.car}<span>${d.drive.text}</span></div>`:''}
+          ${dirBtn}
+        </div>
+        <div class="body">
+          <div class="divider"></div>
+          ${warn}
+          ${ferry}
+          ${lodge}
+          ${spots}
+          ${pass}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+let allOpen=false;
+function toggle(i){
+  const c=document.querySelector(`.card[data-i="${i}"]`);
+  c.classList.toggle('open');
+}
+function setAll(open){
+  document.querySelectorAll('.card').forEach(c=>c.classList.toggle('open',open));
+  allOpen=open;
+  document.getElementById('toggleAll').textContent=open?'Collapse all':'Expand all';
+}
+
+/* countdown + today highlight */
+function meta(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const start=new Date('2026-07-24T00:00:00');
+  const end=new Date('2026-08-03T00:00:00');
+  const cd=document.getElementById('countdown');
+  const days=Math.round((start-today)/86400000);
+  if(today<start) cd.innerHTML=`◷ <b>${days}</b> day${days===1?'':'s'} to go`;
+  else if(today>=start&&today<=end) cd.innerHTML='◉ on the road';
+  else cd.innerHTML='✓ trip complete';
+
+  // highlight & open today's card if within trip
+  const iso=today.toISOString().slice(0,10);
+  const tc=document.querySelector(`.card[data-iso="${iso}"]`);
+  if(tc){ tc.classList.add('today','open'); setTimeout(()=>tc.scrollIntoView({behavior:'smooth',block:'center'}),400); }
+}
+
+render();
+meta();
+document.getElementById('toggleAll').addEventListener('click',()=>setAll(!allOpen));
+</script>
+</body>
+</html>
